@@ -2,7 +2,7 @@ use crate::{rust_main, rust_main_secondary};
 use core::sync::atomic::{Ordering, AtomicUsize};
 
 /// Boot CPU_NUM
-pub const SMP: usize = 1;
+pub const SMP: usize = 4;
 
 /// Boot kernel size allocated in `__entry` for single CPU.
 const BOOT_STACK_SIZE: usize = 0x4_0000;

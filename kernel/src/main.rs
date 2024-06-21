@@ -11,22 +11,28 @@ mod boot;
 mod console;
 mod panic;
 mod heap;
+mod moictests;
 
 #[macro_use]
 extern crate log;
 extern crate alloc;
 
-use alloc::vec::Vec;
 pub use boot::hart_id;
 
+
 pub fn rust_main(hartid: usize) {
-    info!("into rust main");
-    let mut vec = Vec::new();
-    vec.push(45);
-    println!("{:?}", vec.pop());
+    moictests::moic_test_rq_main(hartid);
+    // moictests::moic_test_device_cap_main(hartid);
+    // moictests::moic_test_recv_cap_main(hartid);
+    // moictests::moic_test_send_cap_main(hartid);
 }
 
 pub fn rust_main_secondary(hartid: usize) {
-    info!("into rust main secondary");
+    moictests::moic_test_rq_secondary(hartid);
+    // moictests::moic_test_device_cap_secondary(hartid);
+    // moictests::moic_test_recv_cap_secondary(hartid);
+    // moictests::moic_test_send_cap_secondary(hartid);
 }
+
+
 
