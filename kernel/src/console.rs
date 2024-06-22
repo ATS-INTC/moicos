@@ -1,8 +1,11 @@
-use core::{fmt::{Write, Arguments}, str::FromStr};
-use spin::{Lazy, Mutex};
 use crate::hart_id;
+use core::{
+    fmt::{Arguments, Write},
+    str::FromStr,
+};
+use spin::{Lazy, Mutex};
 
-/// 
+///
 extern crate log;
 
 /// init
@@ -43,9 +46,8 @@ macro_rules! println {
 ///
 static CONSOLE: Lazy<Mutex<Console>> = Lazy::new(|| Mutex::new(Console));
 
-/// 
+///
 pub(crate) struct Console;
-
 
 /// The requirement of `log::Log` trait
 impl log::Log for Console {

@@ -1,6 +1,8 @@
-
 fn main() {
-    use std::{env, fs, path::{Path, PathBuf}};
+    use std::{
+        env, fs,
+        path::{Path, PathBuf},
+    };
 
     let base_address = 0x8020_0000usize;
     let boot_file_content = fs::read_to_string("src/boot.rs").unwrap();

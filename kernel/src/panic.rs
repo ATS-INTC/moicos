@@ -1,6 +1,6 @@
-use sbi_rt::*;
-use core::sync::atomic::{AtomicUsize, Ordering};
 use crate::boot::SMP;
+use core::sync::atomic::{AtomicUsize, Ordering};
+use sbi_rt::*;
 static SHUTDOWN_HART: AtomicUsize = AtomicUsize::new(SMP);
 
 /// not_kernel panic

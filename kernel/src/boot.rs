@@ -1,8 +1,8 @@
 use crate::{rust_main, rust_main_secondary};
-use core::sync::atomic::{Ordering, AtomicUsize};
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Boot CPU_NUM
-pub const SMP: usize = 4;
+pub const SMP: usize = 2;
 
 /// Boot kernel size allocated in `__entry` for single CPU.
 const BOOT_STACK_SIZE: usize = 0x4_0000;
@@ -85,7 +85,6 @@ fn clear_bss() {
 }
 
 static BOOT_HART: AtomicUsize = AtomicUsize::new(0);
-
 
 pub fn rust_main_init(hartid: usize) {
     clear_bss();
