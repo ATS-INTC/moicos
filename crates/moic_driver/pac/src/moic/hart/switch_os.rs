@@ -1,0 +1,32 @@
+#[doc = "Register `switch_os` reader"]
+pub type R = crate::R<SwitchOsSpec>;
+#[doc = "Register `switch_os` writer"]
+pub type W = crate::W<SwitchOsSpec>;
+impl core::fmt::Debug for R {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+        write!(f, "{}", self.bits())
+    }
+}
+impl core::fmt::Debug for crate::generic::Reg<SwitchOsSpec> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        core::fmt::Debug::fmt(&self.read(), f)
+    }
+}
+impl W {}
+#[doc = "Switch os.\n\nYou can [`read`](crate::generic::Reg::read) this register and get [`switch_os::R`](R).  You can [`reset`](crate::generic::Reg::reset), [`write`](crate::generic::Reg::write), [`write_with_zero`](crate::generic::Reg::write_with_zero) this register using [`switch_os::W`](W). You can also [`modify`](crate::generic::Reg::modify) this register. See [API](https://docs.rs/svd2rust/#read--modify--write-api)."]
+pub struct SwitchOsSpec;
+impl crate::RegisterSpec for SwitchOsSpec {
+    type Ux = u64;
+}
+#[doc = "`read()` method returns [`switch_os::R`](R) reader structure"]
+impl crate::Readable for SwitchOsSpec {}
+#[doc = "`write(|w| ..)` method takes [`switch_os::W`](W) writer structure"]
+impl crate::Writable for SwitchOsSpec {
+    type Safety = crate::Unsafe;
+    const ZERO_TO_MODIFY_FIELDS_BITMAP: u64 = 0;
+    const ONE_TO_MODIFY_FIELDS_BITMAP: u64 = 0;
+}
+#[doc = "`reset()` method sets switch_os to value 0"]
+impl crate::Resettable for SwitchOsSpec {
+    const RESET_VALUE: u64 = 0;
+}
