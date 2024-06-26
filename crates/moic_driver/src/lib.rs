@@ -4,7 +4,6 @@
 #![no_std]
 #![deny(missing_docs)]
 
-use core::sync::atomic::Ordering;
 pub use cap_queue::Capability;
 use task::TASK_META_ALIGN;
 pub use task::{TaskMeta, TaskId};
