@@ -2,7 +2,7 @@ use crate::{rust_main, rust_main_secondary};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Boot CPU_NUM
-pub const SMP: usize = 2;
+pub const SMP: usize = 1;
 
 /// Boot kernel size allocated in `__entry` for single CPU.
 const BOOT_STACK_SIZE: usize = 0x4_0000;
@@ -17,8 +17,8 @@ static mut STACK: [u8; TOTAL_BOOT_STACK_SIZE] = [0u8; TOTAL_BOOT_STACK_SIZE];
 /// Entry for the first kernel.
 #[naked]
 #[no_mangle]
-#[link_section = ".text.entry"]
-unsafe extern "C" fn __entry(hartid: usize) -> ! {
+#[link_section = ".text.boot"]
+unsafe extern "C" fn _start(hartid: usize) -> ! {
     core::arch::asm!(
         // Use tp to save hartid
         "mv tp, a0",
@@ -43,7 +43,8 @@ unsafe extern "C" fn __entry(hartid: usize) -> ! {
 /// Entry for other kernels.
 #[naked]
 #[no_mangle]
-unsafe extern "C" fn __entry_others(hartid: usize) -> ! {
+#[link_section = ".text.boot"]
+unsafe extern "C" fn _start_secondary(hartid: usize) -> ! {
     core::arch::asm!(
         // Use tp to save hartid
         "mv tp, a0",
@@ -76,12 +77,12 @@ pub fn hart_id() -> usize {
 }
 
 extern "C" {
-    fn sbss();
-    fn ebss();
+    fn _sbss();
+    fn _ebss();
 }
 
 fn clear_bss() {
-    (sbss as usize..ebss as usize).for_each(|a| unsafe { (a as *mut u8).write_volatile(0) });
+    (_sbss as usize.._ebss as usize).for_each(|a| unsafe { (a as *mut u8).write_volatile(0) });
 }
 
 static BOOT_HART: AtomicUsize = AtomicUsize::new(0);
@@ -96,18 +97,21 @@ pub fn rust_main_init(hartid: usize) {
             let boot_hart_cnt = BOOT_HART.load(Ordering::SeqCst);
             if i != hartid {
                 // Starts other harts.
-                let ret = sbi_rt::hart_start(i, __entry_others as _, 0);
+                let ret = sbi_rt::hart_start(i, _start_secondary as _, 0);
                 assert!(ret.is_ok(), "Failed to shart hart {}", i);
                 while BOOT_HART.load(Ordering::SeqCst) == boot_hart_cnt {}
             }
         }
     }
+    percpu::init(SMP);
+    percpu::set_local_thread_pointer(hartid);
     rust_main(hartid);
     unreachable!();
 }
 
 pub fn rust_main_secondary_init(hartid: usize) {
     BOOT_HART.fetch_add(1, Ordering::SeqCst);
+    percpu::set_local_thread_pointer(hartid);
     rust_main_secondary(hartid);
     unreachable!();
 }

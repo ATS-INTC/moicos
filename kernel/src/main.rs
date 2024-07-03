@@ -9,6 +9,7 @@ mod boot;
 #[macro_use]
 mod console;
 mod heap;
+#[allow(unused)]
 mod moictests;
 mod panic;
 
@@ -19,25 +20,8 @@ extern crate alloc;
 pub use boot::hart_id;
 
 pub fn rust_main(hartid: usize) {
-    // moictests::moic_test_rq_main(hartid);
-    // moictests::moic_test_device_cap_main(hartid);
-    // moictests::moic_test_recv_cap_main(hartid);
-    // moictests::moic_test_send_cap_main(hartid);
-    // moictests::os_send_intr_os_main(hartid);
-    // moictests::os_send_intr_process_main(hartid);
-    // moictests::process_send_intr_os_main(hartid);
-    // moictests::process_send_intr_process_main(hartid);
-    moictests::process_send_intr_process_not_online_main(hartid);
+    unsafe { unified_task::trap_entry() };
 }
 
 pub fn rust_main_secondary(hartid: usize) {
-    // moictests::moic_test_rq_secondary(hartid);
-    // moictests::moic_test_device_cap_secondary(hartid);
-    // moictests::moic_test_recv_cap_secondary(hartid);
-    // moictests::moic_test_send_cap_secondary(hartid);
-    // moictests::os_send_intr_os_secondary(hartid);
-    // moictests::os_send_intr_process_secondary(hartid);
-    // moictests::process_send_intr_os_secondary(hartid);
-    // moictests::process_send_intr_process_secondary(hartid);
-    moictests::process_send_intr_process_not_online_secondary(hartid);
 }

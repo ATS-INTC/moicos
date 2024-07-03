@@ -18,52 +18,105 @@ fn main() {
         format!(
             "\
 OUTPUT_ARCH(riscv)
-ENTRY(__entry)
-SECTIONS {{
-    . = {base_address};
-    skernel = .;
-    stext = .;
-    .text : {{
-        *(.text.entry)
+BASE_ADDRESS = {base_address};
+ENTRY(_start)
+SECTIONS
+{{
+    . = BASE_ADDRESS;
+    _skernel = .;
+
+    .text : ALIGN(4K) {{
+        _stext = .;
+        *(.text.boot)
+        . = ALIGN(4K);
+        *(.text.signal_trampoline)
+        . = ALIGN(4K);
         *(.text .text.*)
+        . = ALIGN(4K);
+        _etext = .;
     }}
 
-    . = ALIGN(4K);
-    etext = .;
-    srodata = .;
-    .rodata : {{
+    .rodata : ALIGN(4K) {{
+        _srodata = .;
         *(.rodata .rodata.*)
+        *(.srodata .srodata.*)
+        *(.sdata2 .sdata2.*)
+        . = ALIGN(4K);
+        _erodata = .;
     }}
 
-    . = ALIGN(4K);
-    erodata = .;
-    s_data = .;
-    .data : {{
+    .data : ALIGN(4K) {{
+        _sdata = .;
+        *(.data.boot_page_table)
+        . = ALIGN(4K);
+        _img_start = .;
+        . = ALIGN(4K);
+        _img_end = .;
+        . = ALIGN(4K);
         *(.data .data.*)
+        *(.sdata .sdata.*)
+        *(.got .got.*)
+	_initcall = .;
+	KEEP(*(.initcall))
+	_initcall_end =.;
     }}
-    e_data = .;
+
+    .tdata : ALIGN(0x10) {{
+        _stdata = .;
+        *(.tdata .tdata.*)
+        _etdata = .;
+    }}
+
+    .tbss : ALIGN(0x10) {{
+        _stbss = .;
+        *(.tbss .tbss.*)
+        *(.tcommon)
+        _etbss = .;
+    }}
 
     . = ALIGN(4K);
-    e_data = .;
-    .bss : {{
+    _percpu_start = .;
+    .percpu 0x0 : AT(_percpu_start) {{
+        _percpu_load_start = .;
+        *(.percpu .percpu.*)
+        _percpu_load_end = .;
+        . = ALIGN(64);
+        _percpu_size_aligned = .;
+
+        . = _percpu_load_start + _percpu_size_aligned * 4;
+    }}
+    . = _percpu_start + SIZEOF(.percpu);
+    _percpu_end = .;
+
+    . = ALIGN(4K);
+    _edata = .;
+
+    .bss : ALIGN(4K) {{
+        boot_stack = .;
         *(.bss.stack)
-        sbss = .;
-        *(.sbss .bss .bss.*)
-        ebss = .;
+        . = ALIGN(4K);
+        boot_stack_top = .;
+
+        _sbss = .;
+        *(.bss .bss.*)
+        *(.sbss .sbss.*)
+        *(COMMON)
+        . = ALIGN(4K);
+        _ebss = .;
     }}
 
-    . = ALIGN(4K);
-    ebss = .;
-    ekernel = .;
+    _ekernel = .;
 
-    /DISCARD/ : {{
-        *(.eh_frame)
+	/DISCARD/ : {{
+        *(.comment) *(.gnu*) *(.note*) *(.eh_frame*)
     }}
-}}"
+}}
+"
         ),
     )
     .unwrap();
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=src/*.rs");
     println!("cargo:rustc-link-arg=-T{}", ld.display());
+    println!("cargo:rustc-link-arg=-no-pie");
 }
